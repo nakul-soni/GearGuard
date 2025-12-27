@@ -3,6 +3,9 @@ import { storage } from './firebase';
 
 export const storageService = {
   async uploadFile(file: File, path: string): Promise<string> {
+    if (!storage) {
+      throw new Error('Firebase Storage is not initialized. Please set up billing or check your configuration.');
+    }
     const storageRef = ref(storage, path);
     await uploadBytes(storageRef, file);
     return getDownloadURL(storageRef);
@@ -27,11 +30,13 @@ export const storageService = {
   },
 
   async deleteFile(path: string): Promise<void> {
+    if (!storage) return;
     const storageRef = ref(storage, path);
     await deleteObject(storageRef);
   },
 
   async listFiles(path: string): Promise<string[]> {
+    if (!storage) return [];
     const storageRef = ref(storage, path);
     const result = await listAll(storageRef);
     const urls = await Promise.all(result.items.map(item => getDownloadURL(item)));
@@ -39,6 +44,7 @@ export const storageService = {
   },
 
   getFileRef(path: string) {
+    if (!storage) return null;
     return ref(storage, path);
   },
 };

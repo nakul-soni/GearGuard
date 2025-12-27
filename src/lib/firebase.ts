@@ -16,5 +16,16 @@ const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-export const storage = getStorage(app);
+
+// Initialize storage conditionally to avoid errors if not configured or blocked by billing
+let storageInstance = null;
+try {
+  if (firebaseConfig.storageBucket && firebaseConfig.storageBucket !== 'undefined') {
+    storageInstance = getStorage(app);
+  }
+} catch (error) {
+  console.warn('Firebase Storage failed to initialize:', error);
+}
+
+export const storage = storageInstance;
 export default app;
