@@ -180,7 +180,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
                     </SelectContent>
                   </Select>
                 </div>
-                {request.status === 'InProgress' || request.status === 'Repaired' && (
+                { (request.status === 'In Progress' || request.status === 'Repaired') && (
                   <div>
                     <p className="text-xs text-muted-foreground mb-2">Hours Spent</p>
                     <div className="flex items-center gap-2">

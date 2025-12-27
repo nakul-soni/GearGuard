@@ -122,13 +122,14 @@ function RequestsListContent() {
               {filteredRequests.map((req) => {
                 const eq = equipment.find(e => e.id === req.equipmentId);
                 const tech = users.find(u => u.id === req.assignedTechnicianId);
-                return (
-                  <TableRow key={req.id} component={motion.tr} 
-                    initial={{ opacity: 0 }} 
-                    animate={{ opacity: 1 }} 
-                    exit={{ opacity: 0 }}
-                    className="group"
-                  >
+                  return (
+                    <motion.tr 
+                      key={req.id}
+                      initial={{ opacity: 0 }} 
+                      animate={{ opacity: 1 }} 
+                      exit={{ opacity: 0 }}
+                      className="hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors group"
+                    >
                     <TableCell className="font-medium">
                       <div className="flex flex-col">
                         <span>{req.subject}</span>
