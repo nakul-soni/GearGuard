@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { useShallow } from 'zustand/shallow';
@@ -10,23 +10,28 @@ import {
   AlertTriangle, 
   CheckCircle2,
   TrendingUp,
-  Activity
+  Activity,
+  Loader2
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useStore } from '@/store/useStore';
 
-const BarChart = dynamic(() => import('recharts').then(mod => mod.BarChart), { ssr: false });
-const Bar = dynamic(() => import('recharts').then(mod => mod.Bar), { ssr: false });
-const XAxis = dynamic(() => import('recharts').then(mod => mod.XAxis), { ssr: false });
-const YAxis = dynamic(() => import('recharts').then(mod => mod.YAxis), { ssr: false });
-const CartesianGrid = dynamic(() => import('recharts').then(mod => mod.CartesianGrid), { ssr: false });
-const Tooltip = dynamic(() => import('recharts').then(mod => mod.Tooltip), { ssr: false });
-const ResponsiveContainer = dynamic(() => import('recharts').then(mod => mod.ResponsiveContainer), { ssr: false });
-const PieChart = dynamic(() => import('recharts').then(mod => mod.PieChart), { ssr: false });
-const Pie = dynamic(() => import('recharts').then(mod => mod.Pie), { ssr: false });
-const Cell = dynamic(() => import('recharts').then(mod => mod.Cell), { ssr: false });
+// Dynamic import for Recharts to avoid SSR issues and ensure component context
+const Recharts = dynamic(() => import('recharts').then(mod => ({
+  BarChart: mod.BarChart,
+  Bar: mod.Bar,
+  XAxis: mod.XAxis,
+  YAxis: mod.YAxis,
+  CartesianGrid: mod.CartesianGrid,
+  Tooltip: mod.Tooltip,
+  ResponsiveContainer: mod.ResponsiveContainer,
+  PieChart: mod.PieChart,
+  Pie: mod.Pie,
+  Cell: mod.Cell,
+})), { ssr: false });
 
 export default function DashboardPage() {
+  const [mounted, setMounted] = useState(false);
   const { equipment, requests, teams } = useStore(
     useShallow((state) => ({
       equipment: state.equipment,
@@ -34,6 +39,10 @@ export default function DashboardPage() {
       teams: state.teams,
     }))
   );
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const stats = useMemo(() => {
     const openRequests = requests.filter(r => r.status !== 'Repaired' && r.status !== 'Scrap').length;
@@ -61,6 +70,14 @@ export default function DashboardPage() {
   })), [teams, requests, equipment]);
 
   const COLORS = ['#f59e0b', '#10b981', '#3b82f6', '#8b5cf6'];
+
+  if (!mounted) {
+    return (
+      <div className="flex h-[400px] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -103,18 +120,24 @@ export default function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={teamData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff10" />
-                <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                <Tooltip 
-                  cursor={{ fill: '#ffffff05' }}
-                  contentStyle={{ backgroundColor: '#18181b', border: 'none', borderRadius: '8px', color: '#fff' }}
-                />
-                <Bar dataKey="requests" fill="currentColor" className="fill-primary" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            {teamData.some(t => t.requests > 0) ? (
+              <Recharts.ResponsiveContainer width="100%" height="100%">
+                <Recharts.BarChart data={teamData}>
+                  <Recharts.CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff10" />
+                  <Recharts.XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                  <Recharts.YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                  <Recharts.Tooltip 
+                    cursor={{ fill: '#ffffff05' }}
+                    contentStyle={{ backgroundColor: '#18181b', border: 'none', borderRadius: '8px', color: '#fff' }}
+                  />
+                  <Recharts.Bar dataKey="requests" fill="currentColor" className="fill-primary" radius={[4, 4, 0, 0]} />
+                </Recharts.BarChart>
+              </Recharts.ResponsiveContainer>
+            ) : (
+              <div className="flex h-full items-center justify-center text-muted-foreground italic border-2 border-dashed border-white/5 rounded-lg">
+                No active requests assigned to teams
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -126,34 +149,42 @@ export default function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={chartData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
-                  paddingAngle={5}
-                  dataKey="value"
-                >
+            {requests.length > 0 ? (
+              <>
+                <Recharts.ResponsiveContainer width="100%" height="100%">
+                  <Recharts.PieChart>
+                    <Recharts.Pie
+                      data={chartData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                      {chartData.map((entry, index) => (
+                        <Recharts.Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Recharts.Pie>
+                    <Recharts.Tooltip 
+                      contentStyle={{ backgroundColor: '#18181b', border: 'none', borderRadius: '8px', color: '#fff' }}
+                    />
+                  </Recharts.PieChart>
+                </Recharts.ResponsiveContainer>
+                <div className="mt-4 flex justify-center gap-6">
                   {chartData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <div key={entry.name} className="flex items-center gap-2">
+                      <div className="h-3 w-3 rounded-full" style={{ backgroundColor: COLORS[index] }} />
+                      <span className="text-xs text-muted-foreground">{entry.name}</span>
+                    </div>
                   ))}
-                </Pie>
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#18181b', border: 'none', borderRadius: '8px', color: '#fff' }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="mt-4 flex justify-center gap-6">
-              {chartData.map((entry, index) => (
-                <div key={entry.name} className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full" style={{ backgroundColor: COLORS[index] }} />
-                  <span className="text-xs text-muted-foreground">{entry.name}</span>
                 </div>
-              ))}
-            </div>
+              </>
+            ) : (
+              <div className="flex h-full items-center justify-center text-muted-foreground italic border-2 border-dashed border-white/5 rounded-lg">
+                No request data available
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

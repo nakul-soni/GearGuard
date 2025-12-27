@@ -1,28 +1,32 @@
 'use client';
 
 import { useMemo, useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { 
   BarChart3, 
   PieChart as PieChartIcon, 
   Zap,
   Hammer,
-  Inbox
+  Inbox,
+  Loader2
 } from 'lucide-react';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer, 
-  PieChart, 
-  Pie, 
-  Cell, 
-  Legend 
-} from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useStore } from '@/store/useStore';
+
+// Dynamic import for Recharts to avoid SSR issues and ensure component context
+const Recharts = dynamic(() => import('recharts').then(mod => ({
+  BarChart: mod.BarChart,
+  Bar: mod.Bar,
+  XAxis: mod.XAxis,
+  YAxis: mod.YAxis,
+  CartesianGrid: mod.CartesianGrid,
+  Tooltip: mod.Tooltip,
+  ResponsiveContainer: mod.ResponsiveContainer,
+  PieChart: mod.PieChart,
+  Pie: mod.Pie,
+  Cell: mod.Cell,
+  Legend: mod.Legend,
+})), { ssr: false });
 
 export default function ReportsPage() {
   const { equipment, requests, teams } = useStore();
@@ -73,7 +77,7 @@ export default function ReportsPage() {
   if (!mounted) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -165,20 +169,20 @@ export default function ReportsPage() {
           </CardHeader>
           <CardContent className="h-[250px] flex items-center justify-center">
             {hasTeamData ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={teamData} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#ffffff10" />
-                  <XAxis type="number" hide />
-                  <YAxis dataKey="name" type="category" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} width={100} />
-                  <Tooltip 
+              <Recharts.ResponsiveContainer width="100%" height="100%">
+                <Recharts.BarChart data={teamData} layout="vertical">
+                  <Recharts.CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#ffffff10" />
+                  <Recharts.XAxis type="number" hide />
+                  <Recharts.YAxis dataKey="name" type="category" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} width={100} />
+                  <Recharts.Tooltip 
                     cursor={{ fill: '#ffffff05' }}
                     contentStyle={{ backgroundColor: '#18181b', border: 'none', borderRadius: '8px', color: '#fff' }}
                   />
-                  <Bar dataKey="count" fill="#3b82f6" radius={[0, 4, 4, 0]} barSize={20} />
-                </BarChart>
-              </ResponsiveContainer>
+                  <Recharts.Bar dataKey="count" fill="#3b82f6" radius={[0, 4, 4, 0]} barSize={20} />
+                </Recharts.BarChart>
+              </Recharts.ResponsiveContainer>
             ) : (
-              <div className="text-center space-y-2">
+              <div className="text-center space-y-2 italic border-2 border-dashed border-white/5 p-4 rounded-lg w-full">
                 <p className="text-sm text-muted-foreground">No active requests assigned to teams.</p>
                 <p className="text-xs text-muted-foreground/60">Try updating a request to link it with equipment.</p>
               </div>
@@ -198,9 +202,9 @@ export default function ReportsPage() {
           </CardHeader>
           <CardContent className="h-[300px] flex items-center justify-center">
             {hasCategoryData ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
+              <Recharts.ResponsiveContainer width="100%" height="100%">
+                <Recharts.PieChart>
+                  <Recharts.Pie
                     data={categoryData}
                     cx="50%"
                     cy="50%"
@@ -211,17 +215,17 @@ export default function ReportsPage() {
                     label
                   >
                     {categoryData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      <Recharts.Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
-                  </Pie>
-                  <Tooltip 
+                  </Recharts.Pie>
+                  <Recharts.Tooltip 
                     contentStyle={{ backgroundColor: '#18181b', border: 'none', borderRadius: '8px', color: '#fff' }}
                   />
-                  <Legend iconType="circle" />
-                </PieChart>
-              </ResponsiveContainer>
+                  <Recharts.Legend iconType="circle" />
+                </Recharts.PieChart>
+              </Recharts.ResponsiveContainer>
             ) : (
-              <div className="text-center space-y-2">
+              <div className="text-center space-y-2 italic border-2 border-dashed border-white/5 p-4 rounded-lg w-full">
                 <p className="text-sm text-muted-foreground">Category data not available.</p>
               </div>
             )}
@@ -238,9 +242,9 @@ export default function ReportsPage() {
           </CardHeader>
           <CardContent className="h-[300px] flex items-center justify-center">
             {hasStatusData ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
+              <Recharts.ResponsiveContainer width="100%" height="100%">
+                <Recharts.PieChart>
+                  <Recharts.Pie
                     data={statusData}
                     cx="50%"
                     cy="50%"
@@ -250,17 +254,17 @@ export default function ReportsPage() {
                     dataKey="value"
                   >
                     {statusData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[(index + 2) % COLORS.length]} />
+                      <Recharts.Cell key={`cell-${index}`} fill={COLORS[(index + 2) % COLORS.length]} />
                     ))}
-                  </Pie>
-                  <Tooltip 
+                  </Recharts.Pie>
+                  <Recharts.Tooltip 
                     contentStyle={{ backgroundColor: '#18181b', border: 'none', borderRadius: '8px', color: '#fff' }}
                   />
-                  <Legend iconType="circle" />
-                </PieChart>
-              </ResponsiveContainer>
+                  <Recharts.Legend iconType="circle" />
+                </Recharts.PieChart>
+              </Recharts.ResponsiveContainer>
             ) : (
-              <div className="text-center space-y-2">
+              <div className="text-center space-y-2 italic border-2 border-dashed border-white/5 p-4 rounded-lg w-full">
                 <p className="text-sm text-muted-foreground">Status data not available.</p>
               </div>
             )}
