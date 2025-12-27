@@ -7,8 +7,8 @@ import {
   signInWithPopup,
   User,
   updateProfile,
-} from '@firebase/auth';
-import { doc, setDoc, getDoc } from '@firebase/firestore';
+} from 'firebase/auth';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from './firebase';
 
 export type AuthUser = User;

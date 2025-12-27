@@ -4,10 +4,7 @@ import { Search, Bell, Menu, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-<<<<<<< HEAD
-=======
 import { ModeToggle } from './mode-toggle';
->>>>>>> c66372c (Final Commit)
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,11 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-<<<<<<< HEAD
-import { useAuth } from '@/components/providers/auth-provider';
-=======
 import { useAuth } from '@/components/providers/firebase-auth-provider';
->>>>>>> c66372c (Final Commit)
 import { signOut } from '@/lib/auth';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
@@ -50,20 +43,12 @@ export function Header() {
         />
       </div>
       
-<<<<<<< HEAD
       <div className="flex items-center gap-4">
+        <ModeToggle />
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="h-5 w-5" />
           <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-destructive" />
         </Button>
-=======
-        <div className="flex items-center gap-4">
-          <ModeToggle />
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-5 w-5" />
-            <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-destructive" />
-          </Button>
->>>>>>> c66372c (Final Commit)
         
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

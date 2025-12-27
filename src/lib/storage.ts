@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { ref, uploadBytes, getDownloadURL, deleteObject, listAll } from 'firebase/storage';
 import { storage } from './firebase';
 
@@ -49,24 +48,13 @@ export const storageService = {
     return ref(storage, path);
   },
 };
-=======
-import {
-  ref,
-  uploadBytes,
-  getDownloadURL,
-  deleteObject,
-} from '@firebase/storage';
-import { storage } from './firebase';
 
 export async function uploadFile(path: string, file: File): Promise<string> {
-  const storageRef = ref(storage, path);
-  const snapshot = await uploadBytes(storageRef, file);
-  return getDownloadURL(snapshot.ref);
+  return storageService.uploadFile(file, path);
 }
 
 export async function deleteFile(path: string): Promise<void> {
-  const storageRef = ref(storage, path);
-  return deleteObject(storageRef);
+  return storageService.deleteFile(path);
 }
 
 export async function uploadImage(file: File, folder: string = 'images'): Promise<string> {
@@ -75,4 +63,3 @@ export async function uploadImage(file: File, folder: string = 'images'): Promis
   const path = `${folder}/${timestamp}-${Math.random().toString(36).substring(7)}.${extension}`;
   return uploadFile(path, file);
 }
->>>>>>> c66372c (Final Commit)

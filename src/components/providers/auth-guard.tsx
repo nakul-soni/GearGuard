@@ -3,11 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
-<<<<<<< HEAD
-import { useAuth } from '@/components/providers/auth-provider';
-=======
 import { useAuth } from '@/components/providers/firebase-auth-provider';
->>>>>>> c66372c (Final Commit)
 import { useStore } from '@/store/useStore';
 
 const PUBLIC_ROUTES = ['/login'];
@@ -48,17 +44,6 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (user && dataLoading && !PUBLIC_ROUTES.includes(pathname)) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
-          <p className="text-muted-foreground">Loading data...</p>
-        </div>
       </div>
     );
   }
