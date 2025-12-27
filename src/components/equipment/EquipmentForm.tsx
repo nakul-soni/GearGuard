@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -46,20 +47,35 @@ export function EquipmentForm({ onSuccess, initialData }: EquipmentFormProps) {
 
   const registeredUsers = users.filter(user => user.name && user.name.trim() !== '');
 
-  const form = useForm<z.infer<typeof equipmentSchema>>({
-    resolver: zodResolver(equipmentSchema),
-    defaultValues: initialData || {
-      name: '',
-      serialNumber: '',
-      purchaseDate: new Date().toISOString().split('T')[0],
-      warrantyInfo: '',
-      location: '',
-      department: '',
-      assignedEmployee: '',
-      maintenanceTeamId: teams[0]?.id || '',
-      category: 'Manufacturing',
-    },
-  });
+    const form = useForm<z.infer<typeof equipmentSchema>>({
+      resolver: zodResolver(equipmentSchema),
+      defaultValues: initialData || {
+        name: '',
+        serialNumber: '',
+        purchaseDate: new Date().toISOString().split('T')[0],
+        warrantyInfo: '',
+        location: '',
+        department: '',
+        assignedEmployee: '',
+        maintenanceTeamId: teams[0]?.id || '',
+        category: 'Manufacturing',
+      },
+    });
+
+    const selectedTeamId = form.watch('maintenanceTeamId');
+    const selectedTeam = teams.find(t => t.id === selectedTeamId);
+    const teamMemberIds = selectedTeam?.memberIds || [];
+    
+    const filteredUsers = registeredUsers.filter(user => 
+      teamMemberIds.includes(user.id)
+    );
+
+    useEffect(() => {
+      const currentEmployee = form.getValues('assignedEmployee');
+      if (currentEmployee && !filteredUsers.some(u => u.name === currentEmployee)) {
+        form.setValue('assignedEmployee', '');
+      }
+    }, [selectedTeamId, filteredUsers, form]);
 
     function onSubmit(values: z.infer<typeof equipmentSchema>) {
       if (initialData) {
@@ -186,13 +202,13 @@ export function EquipmentForm({ onSuccess, initialData }: EquipmentFormProps) {
                         <SelectValue placeholder="Select employee" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
-                      {registeredUsers.map((user) => (
-                        <SelectItem key={user.id} value={user.name}>
-                          {user.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
+                      <SelectContent>
+                        {filteredUsers.map((user) => (
+                          <SelectItem key={user.id} value={user.name}>
+                            {user.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
                   </Select>
                   <FormMessage />
                 </FormItem>
