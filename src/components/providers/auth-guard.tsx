@@ -3,7 +3,11 @@
 import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
+<<<<<<< HEAD
 import { useAuth } from '@/components/providers/auth-provider';
+=======
+import { useAuth } from '@/components/providers/firebase-auth-provider';
+>>>>>>> c66372c (Final Commit)
 import { useStore } from '@/store/useStore';
 
 const PUBLIC_ROUTES = ['/login'];
