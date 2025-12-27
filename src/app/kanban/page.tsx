@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { useShallow } from 'zustand/shallow';
 import { 
   AlertTriangle, 
   Calendar, 
@@ -27,12 +28,34 @@ const COLUMNS: { id: RequestStatus; label: string; color: string }[] = [
 ];
 
 export default function KanbanPage() {
-  const { requests, equipment, users, moveRequest } = useStore();
+  const { requests, equipment, users, moveRequest } = useStore(
+    useShallow((state) => ({
+      requests: state.requests,
+      equipment: state.equipment,
+      users: state.users,
+      moveRequest: state.moveRequest,
+    }))
+  );
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  const groupedRequests = useMemo(() => {
+    const groups: Record<RequestStatus, MaintenanceRequest[]> = {
+      'New': [],
+      'In Progress': [],
+      'Repaired': [],
+      'Scrap': [],
+    };
+    requests.forEach(req => {
+      if (groups[req.status]) {
+        groups[req.status].push(req);
+      }
+    });
+    return groups;
+  }, [requests]);
 
   if (!isMounted) return null;
 
@@ -53,10 +76,6 @@ export default function KanbanPage() {
     toast.success(`Request moved to ${newStatus}`);
   };
 
-  const getRequestsByStatus = (status: RequestStatus) => {
-    return requests.filter((r) => r.status === status);
-  };
-
   return (
     <div className="h-full flex flex-col gap-6">
       <div>
@@ -73,7 +92,7 @@ export default function KanbanPage() {
                   <div className={cn("h-2 w-2 rounded-full", column.color)} />
                   <h3 className="font-semibold">{column.label}</h3>
                   <Badge variant="secondary" className="ml-2 bg-muted/50">
-                    {getRequestsByStatus(column.id).length}
+                    {groupedRequests[column.id].length}
                   </Badge>
                 </div>
               </div>
@@ -89,7 +108,7 @@ export default function KanbanPage() {
                     )}
                   >
                     <div className="flex flex-col gap-3">
-                      {getRequestsByStatus(column.id).map((req, index) => {
+                      {groupedRequests[column.id].map((req, index) => {
                         const eq = equipment.find(e => e.id === req.equipmentId);
                         const tech = users.find(u => u.id === req.assignedTechnicianId);
                         const isOverdue = req.type === 'Preventive' && req.scheduledDate && new Date(req.scheduledDate) < new Date() && req.status !== 'Repaired';

@@ -1,20 +1,8 @@
 'use client';
 
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
-  LineChart,
-  Line
-} from 'recharts';
+import { useMemo } from 'react';
+import dynamic from 'next/dynamic';
+import { useShallow } from 'zustand/shallow';
 import { 
   BarChart3, 
   PieChart as PieChartIcon, 
@@ -26,36 +14,66 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useStore } from '@/store/useStore';
 
+const BarChart = dynamic(() => import('recharts').then(mod => mod.BarChart), { ssr: false });
+const Bar = dynamic(() => import('recharts').then(mod => mod.Bar), { ssr: false });
+const XAxis = dynamic(() => import('recharts').then(mod => mod.XAxis), { ssr: false });
+const YAxis = dynamic(() => import('recharts').then(mod => mod.YAxis), { ssr: false });
+const CartesianGrid = dynamic(() => import('recharts').then(mod => mod.CartesianGrid), { ssr: false });
+const Tooltip = dynamic(() => import('recharts').then(mod => mod.Tooltip), { ssr: false });
+const ResponsiveContainer = dynamic(() => import('recharts').then(mod => mod.ResponsiveContainer), { ssr: false });
+const PieChart = dynamic(() => import('recharts').then(mod => mod.PieChart), { ssr: false });
+const Pie = dynamic(() => import('recharts').then(mod => mod.Pie), { ssr: false });
+const Cell = dynamic(() => import('recharts').then(mod => mod.Cell), { ssr: false });
+const Legend = dynamic(() => import('recharts').then(mod => mod.Legend), { ssr: false });
+const LineChart = dynamic(() => import('recharts').then(mod => mod.LineChart), { ssr: false });
+const Line = dynamic(() => import('recharts').then(mod => mod.Line), { ssr: false });
+
 export default function ReportsPage() {
-  const { equipment, requests, teams } = useStore();
+  const { equipment, requests, teams } = useStore(
+    useShallow((state) => ({
+      equipment: state.equipment,
+      requests: state.requests,
+      teams: state.teams,
+    }))
+  );
 
   const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
   // Requests per Team
-  const teamData = teams.map(team => ({
+  const teamData = useMemo(() => teams.map(team => ({
     name: team.name,
     count: requests.filter(r => {
       const eq = equipment.find(e => e.id === r.equipmentId);
       return eq?.maintenanceTeamId === team.id;
     }).length
-  }));
+  })), [teams, requests, equipment]);
 
   // Requests per Category
-  const categories: Record<string, number> = {};
-  requests.forEach(r => {
-    const eq = equipment.find(e => e.id === r.equipmentId);
-    if (eq) {
-      categories[eq.category] = (categories[eq.category] || 0) + 1;
-    }
-  });
-  const categoryData = Object.entries(categories).map(([name, value]) => ({ name, value }));
+  const categoryData = useMemo(() => {
+    const categories: Record<string, number> = {};
+    requests.forEach(r => {
+      const eq = equipment.find(e => e.id === r.equipmentId);
+      if (eq) {
+        categories[eq.category] = (categories[eq.category] || 0) + 1;
+      }
+    });
+    return Object.entries(categories).map(([name, value]) => ({ name, value }));
+  }, [requests, equipment]);
 
   // Status distribution
-  const statuses: Record<string, number> = {};
-  requests.forEach(r => {
-    statuses[r.status] = (statuses[r.status] || 0) + 1;
-  });
-  const statusData = Object.entries(statuses).map(([name, value]) => ({ name, value }));
+  const statusData = useMemo(() => {
+    const statuses: Record<string, number> = {};
+    requests.forEach(r => {
+      statuses[r.status] = (statuses[r.status] || 0) + 1;
+    });
+    return Object.entries(statuses).map(([name, value]) => ({ name, value }));
+  }, [requests]);
+
+  const quickStats = useMemo(() => ({
+    resolutionRate: Math.round((requests.filter(r => r.status === 'Repaired').length / requests.length) * 100) || 0,
+    preventiveRatio: Math.round((requests.filter(r => r.type === 'Preventive').length / requests.length) * 100) || 0,
+    scrapRate: Math.round((requests.filter(r => r.status === 'Scrap').length / requests.length) * 100) || 0,
+  }), [requests]);
 
   return (
     <div className="space-y-8">
@@ -72,26 +90,27 @@ export default function ReportsPage() {
               Quick Stats
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex justify-between items-center p-3 rounded-lg bg-primary/5 border border-primary/10">
-              <span className="text-sm font-medium">Resolution Rate</span>
-              <span className="text-lg font-bold text-primary">
-                {Math.round((requests.filter(r => r.status === 'Repaired').length / requests.length) * 100) || 0}%
-              </span>
-            </div>
-            <div className="flex justify-between items-center p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/10">
-              <span className="text-sm font-medium">Preventive Ratio</span>
-              <span className="text-lg font-bold text-emerald-500">
-                {Math.round((requests.filter(r => r.type === 'Preventive').length / requests.length) * 100) || 0}%
-              </span>
-            </div>
-            <div className="flex justify-between items-center p-3 rounded-lg bg-destructive/5 border border-destructive/10">
-              <span className="text-sm font-medium">Scrap Rate</span>
-              <span className="text-lg font-bold text-destructive">
-                {Math.round((requests.filter(r => r.status === 'Scrap').length / requests.length) * 100) || 0}%
-              </span>
-            </div>
-          </CardContent>
+            <CardContent className="space-y-4">
+              <div className="flex justify-between items-center p-3 rounded-lg bg-primary/5 border border-primary/10">
+                <span className="text-sm font-medium">Resolution Rate</span>
+                <span className="text-lg font-bold text-primary">
+                  {quickStats.resolutionRate}%
+                </span>
+              </div>
+              <div className="flex justify-between items-center p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/10">
+                <span className="text-sm font-medium">Preventive Ratio</span>
+                <span className="text-lg font-bold text-emerald-500">
+                  {quickStats.preventiveRatio}%
+                </span>
+              </div>
+              <div className="flex justify-between items-center p-3 rounded-lg bg-destructive/5 border border-destructive/10">
+                <span className="text-sm font-medium">Scrap Rate</span>
+                <span className="text-lg font-bold text-destructive">
+                  {quickStats.scrapRate}%
+                </span>
+              </div>
+            </CardContent>
+
         </Card>
 
         <Card className="lg:col-span-2 border-none bg-card/50 shadow-lg backdrop-blur-sm">

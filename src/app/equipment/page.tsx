@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Plus, Search, Filter } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -25,18 +25,20 @@ import { EquipmentForm } from '@/components/equipment/EquipmentForm';
 import { EquipmentCategory } from '@/types';
 
 export default function EquipmentListPage() {
-  const { equipment } = useStore();
+  const equipment = useStore((state) => state.equipment);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<string>('all');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const filteredEquipment = equipment.filter((eq) => {
-    const matchesSearch = 
-      eq.name.toLowerCase().includes(search.toLowerCase()) || 
-      eq.serialNumber.toLowerCase().includes(search.toLowerCase());
-    const matchesCategory = category === 'all' || eq.category === category;
-    return matchesSearch && matchesCategory;
-  });
+  const filteredEquipment = useMemo(() => {
+    return equipment.filter((eq) => {
+      const matchesSearch = 
+        eq.name.toLowerCase().includes(search.toLowerCase()) || 
+        eq.serialNumber.toLowerCase().includes(search.toLowerCase());
+      const matchesCategory = category === 'all' || eq.category === category;
+      return matchesSearch && matchesCategory;
+    });
+  }, [equipment, search, category]);
 
   return (
     <div className="space-y-6">

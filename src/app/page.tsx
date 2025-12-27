@@ -1,6 +1,9 @@
 'use client';
 
+import { useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
+import { useShallow } from 'zustand/shallow';
 import { 
   Settings, 
   ClipboardList, 
@@ -9,47 +12,53 @@ import {
   TrendingUp,
   Activity
 } from 'lucide-react';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell
-} from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useStore } from '@/store/useStore';
 
+const BarChart = dynamic(() => import('recharts').then(mod => mod.BarChart), { ssr: false });
+const Bar = dynamic(() => import('recharts').then(mod => mod.Bar), { ssr: false });
+const XAxis = dynamic(() => import('recharts').then(mod => mod.XAxis), { ssr: false });
+const YAxis = dynamic(() => import('recharts').then(mod => mod.YAxis), { ssr: false });
+const CartesianGrid = dynamic(() => import('recharts').then(mod => mod.CartesianGrid), { ssr: false });
+const Tooltip = dynamic(() => import('recharts').then(mod => mod.Tooltip), { ssr: false });
+const ResponsiveContainer = dynamic(() => import('recharts').then(mod => mod.ResponsiveContainer), { ssr: false });
+const PieChart = dynamic(() => import('recharts').then(mod => mod.PieChart), { ssr: false });
+const Pie = dynamic(() => import('recharts').then(mod => mod.Pie), { ssr: false });
+const Cell = dynamic(() => import('recharts').then(mod => mod.Cell), { ssr: false });
+
 export default function DashboardPage() {
-  const { equipment, requests, teams } = useStore();
+  const { equipment, requests, teams } = useStore(
+    useShallow((state) => ({
+      equipment: state.equipment,
+      requests: state.requests,
+      teams: state.teams,
+    }))
+  );
 
-  const openRequests = requests.filter(r => r.status !== 'Repaired' && r.status !== 'Scrap').length;
-  const correctiveRequests = requests.filter(r => r.type === 'Corrective').length;
-  const preventiveRequests = requests.filter(r => r.type === 'Preventive').length;
+  const stats = useMemo(() => {
+    const openRequests = requests.filter(r => r.status !== 'Repaired' && r.status !== 'Scrap').length;
+    const completedJobs = requests.filter(r => r.status === 'Repaired').length;
 
-  const stats = [
-    { label: 'Total Equipment', value: equipment.length, icon: Settings, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-    { label: 'Open Requests', value: openRequests, icon: AlertTriangle, color: 'text-amber-500', bg: 'bg-amber-500/10' },
-    { label: 'Total Teams', value: teams.length, icon: Activity, color: 'text-purple-500', bg: 'bg-purple-500/10' },
-    { label: 'Completed Jobs', value: requests.filter(r => r.status === 'Repaired').length, icon: CheckCircle2, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-  ];
+    return [
+      { label: 'Total Equipment', value: equipment.length, icon: Settings, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+      { label: 'Open Requests', value: openRequests, icon: AlertTriangle, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+      { label: 'Total Teams', value: teams.length, icon: Activity, color: 'text-purple-500', bg: 'bg-purple-500/10' },
+      { label: 'Completed Jobs', value: completedJobs, icon: CheckCircle2, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+    ];
+  }, [equipment.length, requests, teams.length]);
 
-  const chartData = [
-    { name: 'Corrective', value: correctiveRequests },
-    { name: 'Preventive', value: preventiveRequests },
-  ];
+  const chartData = useMemo(() => [
+    { name: 'Corrective', value: requests.filter(r => r.type === 'Corrective').length },
+    { name: 'Preventive', value: requests.filter(r => r.type === 'Preventive').length },
+  ], [requests]);
 
-  const teamData = teams.map(team => ({
+  const teamData = useMemo(() => teams.map(team => ({
     name: team.name,
     requests: requests.filter(r => {
       const eq = equipment.find(e => e.id === r.equipmentId);
       return eq?.maintenanceTeamId === team.id;
     }).length
-  }));
+  })), [teams, requests, equipment]);
 
   const COLORS = ['#f59e0b', '#10b981', '#3b82f6', '#8b5cf6'];
 
