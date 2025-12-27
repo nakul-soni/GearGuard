@@ -233,7 +233,7 @@ export default function TeamsPage() {
                       {teamMembers.length > 0 ? (
                         teamMembers.map((member) => (
                           <Avatar key={member.id} className="inline-block border-2 border-background ring-2 ring-primary/5 transition-transform hover:z-10 hover:scale-110 cursor-pointer">
-                            <AvatarImage src={member.avatar} alt={member.name} />
+                            <AvatarImage src={member.avatar} alt={member.name || 'User'} />
                               <AvatarFallback>{member.name?.charAt(0) || 'U'}</AvatarFallback>
                             </Avatar>
                           ))
@@ -315,12 +315,12 @@ export default function TeamsPage() {
                   return (
                     <div key={member.id} className="flex items-center justify-between p-2 hover:bg-muted/50 rounded-lg">
                       <div className="flex items-center gap-3">
-                        <Avatar className="h-10 w-10">
-                          <AvatarImage src={member.avatar} alt={member.name} />
-                          <AvatarFallback>{member.name?.charAt(0) || 'U'}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium text-sm">{member.name}</p>
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage src={member.avatar} alt={member.name || 'User'} />
+                            <AvatarFallback>{member.name?.charAt(0) || 'U'}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-medium text-sm">{member.name || 'Anonymous User'}</p>
                           <p className="text-xs text-muted-foreground">
                             {memberEquipment.length} equipment assigned
                           </p>
@@ -412,14 +412,14 @@ export default function TeamsPage() {
                         onClick={() => handleSelectUser(user.id)}
                       >
                         <div className="flex items-center gap-3">
-                          <Avatar className="h-10 w-10">
-                            <AvatarImage src={user.avatar} alt={user.name} />
-                            <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-medium">{user.name}</p>
-                            <p className="text-xs text-muted-foreground">{user.role}</p>
-                          </div>
+                            <Avatar className="h-10 w-10">
+                              <AvatarImage src={user.avatar} alt={user.name || 'User'} />
+                              <AvatarFallback>{user.name?.charAt(0) || 'U'}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-medium">{user.name || 'Anonymous User'}</p>
+                              <p className="text-xs text-muted-foreground">{user.role}</p>
+                            </div>
                         </div>
                       </div>
                     ))
