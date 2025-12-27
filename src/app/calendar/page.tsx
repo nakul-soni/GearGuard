@@ -25,7 +25,27 @@ import { useRouter } from 'next/navigation';
 export default function CalendarPage() {
   const router = useRouter();
   const { requests, equipment } = useStore();
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState<Date | null>(null);
+
+  // Set initial date on client to avoid hydration mismatch
+  useEffect(() => {
+    setCurrentDate(new Date());
+  }, []);
+
+  const nextMonth = () => currentDate && setCurrentDate(addMonths(currentDate, 1));
+  const prevMonth = () => currentDate && setCurrentDate(subMonths(currentDate, 1));
+
+  if (!currentDate) return null;
+
+  const monthStart = startOfMonth(currentDate);
+  const monthEnd = endOfMonth(monthStart);
+  const startDate = startOfWeek(monthStart);
+  const endDate = endOfWeek(monthEnd);
+
+  const calendarDays = eachDayOfInterval({
+    start: startDate,
+    end: endDate,
+  });
 
   const calendarRequests = requests.filter(r => r.scheduledDate || r.createdAt);
 

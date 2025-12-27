@@ -64,12 +64,12 @@ export default function ReportsPage() {
   }, [requests]);
 
   const quickStats = useMemo(() => ({
-    resolutionRate: Math.round((requests.filter(r => r.status === 'Repaired').length / requests.length) * 100) || 0,
-    preventiveRatio: Math.round((requests.filter(r => r.type === 'Preventive').length / requests.length) * 100) || 0,
-    scrapRate: Math.round((requests.filter(r => r.status === 'Scrap').length / requests.length) * 100) || 0,
+    resolutionRate: requests.length > 0 ? Math.round((requests.filter(r => r.status === 'Repaired').length / requests.length) * 100) : 0,
+    preventiveRatio: requests.length > 0 ? Math.round((requests.filter(r => r.type === 'Preventive').length / requests.length) * 100) : 0,
+    scrapRate: requests.length > 0 ? Math.round((requests.filter(r => r.status === 'Scrap').length / requests.length) * 100) : 0,
   }), [requests]);
 
-  if (requests.length === 0) {
+  if (requests.length === 0 || equipment.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
         <div className="p-6 rounded-full bg-primary/10">
@@ -77,7 +77,11 @@ export default function ReportsPage() {
         </div>
         <div className="text-center">
           <h2 className="text-2xl font-bold">No Data Available</h2>
-          <p className="text-muted-foreground">Start by creating maintenance requests to see your analytics.</p>
+          <p className="text-muted-foreground">
+            {equipment.length === 0 
+              ? "Start by adding some equipment to your inventory." 
+              : "Create maintenance requests to see your analytics."}
+          </p>
         </div>
       </div>
     );
