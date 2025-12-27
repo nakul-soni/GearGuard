@@ -16,19 +16,11 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useStore } from '@/store/useStore';
 
-// Dynamic import for Recharts to avoid SSR issues and ensure component context
-const Recharts = dynamic(() => import('recharts').then(mod => ({
-  BarChart: mod.BarChart,
-  Bar: mod.Bar,
-  XAxis: mod.XAxis,
-  YAxis: mod.YAxis,
-  CartesianGrid: mod.CartesianGrid,
-  Tooltip: mod.Tooltip,
-  ResponsiveContainer: mod.ResponsiveContainer,
-  PieChart: mod.PieChart,
-  Pie: mod.Pie,
-  Cell: mod.Cell,
-})), { ssr: false });
+// Dynamic import for Recharts to avoid SSR issues
+const Charts = dynamic(() => import('@/components/RechartsWrapper'), { 
+  ssr: false,
+  loading: () => <div className="h-full w-full flex items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+});
 
 export default function DashboardPage() {
   const [mounted, setMounted] = useState(false);
@@ -121,18 +113,18 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="h-[300px]">
             {teamData.some(t => t.requests > 0) ? (
-              <Recharts.ResponsiveContainer width="100%" height="100%">
-                <Recharts.BarChart data={teamData}>
-                  <Recharts.CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff10" />
-                  <Recharts.XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                  <Recharts.YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                  <Recharts.Tooltip 
+              <Charts.ResponsiveContainer width="100%" height="100%">
+                <Charts.BarChart data={teamData}>
+                  <Charts.CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff10" />
+                  <Charts.XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                  <Charts.YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                  <Charts.Tooltip 
                     cursor={{ fill: '#ffffff05' }}
                     contentStyle={{ backgroundColor: '#18181b', border: 'none', borderRadius: '8px', color: '#fff' }}
                   />
-                  <Recharts.Bar dataKey="requests" fill="currentColor" className="fill-primary" radius={[4, 4, 0, 0]} />
-                </Recharts.BarChart>
-              </Recharts.ResponsiveContainer>
+                  <Charts.Bar dataKey="requests" fill="currentColor" className="fill-primary" radius={[4, 4, 0, 0]} />
+                </Charts.BarChart>
+              </Charts.ResponsiveContainer>
             ) : (
               <div className="flex h-full items-center justify-center text-muted-foreground italic border-2 border-dashed border-white/5 rounded-lg">
                 No active requests assigned to teams
@@ -148,44 +140,44 @@ export default function DashboardPage() {
               Request Distribution
             </CardTitle>
           </CardHeader>
-          <CardContent className="h-[300px]">
-            {requests.length > 0 ? (
-              <>
-                <Recharts.ResponsiveContainer width="100%" height="100%">
-                  <Recharts.PieChart>
-                    <Recharts.Pie
-                      data={chartData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={80}
-                      paddingAngle={5}
-                      dataKey="value"
-                    >
-                      {chartData.map((entry, index) => (
-                        <Recharts.Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Recharts.Pie>
-                    <Recharts.Tooltip 
-                      contentStyle={{ backgroundColor: '#18181b', border: 'none', borderRadius: '8px', color: '#fff' }}
-                    />
-                  </Recharts.PieChart>
-                </Recharts.ResponsiveContainer>
-                <div className="mt-4 flex justify-center gap-6">
-                  {chartData.map((entry, index) => (
-                    <div key={entry.name} className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded-full" style={{ backgroundColor: COLORS[index] }} />
-                      <span className="text-xs text-muted-foreground">{entry.name}</span>
-                    </div>
-                  ))}
+            <CardContent className="h-[300px]">
+              {requests.length > 0 ? (
+                <>
+                  <Charts.ResponsiveContainer width="100%" height="100%">
+                    <Charts.PieChart>
+                      <Charts.Pie
+                        data={chartData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={80}
+                        paddingAngle={5}
+                        dataKey="value"
+                      >
+                        {chartData.map((entry, index) => (
+                          <Charts.Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Charts.Pie>
+                      <Charts.Tooltip 
+                        contentStyle={{ backgroundColor: '#18181b', border: 'none', borderRadius: '8px', color: '#fff' }}
+                      />
+                    </Charts.PieChart>
+                  </Charts.ResponsiveContainer>
+                  <div className="mt-4 flex justify-center gap-6">
+                    {chartData.map((entry, index) => (
+                      <div key={entry.name} className="flex items-center gap-2">
+                        <div className="h-3 w-3 rounded-full" style={{ backgroundColor: COLORS[index] }} />
+                        <span className="text-xs text-muted-foreground">{entry.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="flex h-full items-center justify-center text-muted-foreground italic border-2 border-dashed border-white/5 rounded-lg">
+                  No request data available
                 </div>
-              </>
-            ) : (
-              <div className="flex h-full items-center justify-center text-muted-foreground italic border-2 border-dashed border-white/5 rounded-lg">
-                No request data available
-              </div>
-            )}
-          </CardContent>
+              )}
+            </CardContent>
         </Card>
       </div>
     </div>
