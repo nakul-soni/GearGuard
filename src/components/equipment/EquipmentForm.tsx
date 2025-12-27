@@ -59,22 +59,21 @@ export function EquipmentForm({ onSuccess, initialData }: EquipmentFormProps) {
     },
   });
 
-  function onSubmit(values: z.infer<typeof equipmentSchema>) {
-    if (initialData) {
-      updateEquipment(initialData.id, values);
-      toast.success('Equipment updated successfully');
-    } else {
-      const newEquipment: Equipment = {
-        ...values,
-        id: Math.random().toString(36).substr(2, 9),
-        status: 'Active',
-        defaultTechnicianId: '', // Would be assigned later or by team
-      };
-      addEquipment(newEquipment);
-      toast.success('Equipment added successfully');
+    function onSubmit(values: z.infer<typeof equipmentSchema>) {
+      if (initialData) {
+        updateEquipment(initialData.id, values);
+        toast.success('Equipment updated successfully');
+      } else {
+        const newEquipment = {
+          ...values,
+          status: 'Active' as EquipmentStatus,
+          defaultTechnicianId: '',
+        };
+        addEquipment(newEquipment);
+        toast.success('Equipment added successfully');
+      }
+      onSuccess?.();
     }
-    onSuccess?.();
-  }
 
   return (
     <Form {...form}>

@@ -80,9 +80,8 @@ export function RequestForm({ onSuccess, initialData, prefilledEquipmentId, pref
       updateRequest(initialData.id, values);
       toast.success('Maintenance request updated');
     } else {
-      const newRequest: MaintenanceRequest = {
+      const newRequest = {
         ...values,
-        id: Math.random().toString(36).substr(2, 9),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
