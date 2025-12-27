@@ -29,9 +29,10 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
               {children}
             </motion.div>
           </AnimatePresence>
-        ) : (
-          <div className="flex min-h-screen bg-background text-foreground transition-colors duration-300">
-            <Sidebar />
+          ) : (
+            <div className="flex min-h-screen bg-transparent text-foreground transition-colors duration-300">
+              <Sidebar />
+
             <div className="pl-64 flex flex-col w-full">
               <Header />
               <main className="flex-1 overflow-x-hidden">

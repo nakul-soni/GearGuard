@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ClientLayout } from "@/components/layout/client-layout";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { BackgroundAnimation } from "@/components/ui/background-animation";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,9 +37,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ClientLayout>
-            {children}
-          </ClientLayout>
+            <BackgroundAnimation />
+            <ClientLayout>
+              {children}
+            </ClientLayout>
+
           <Toaster position="top-right" closeButton richColors />
         </ThemeProvider>
       </body>

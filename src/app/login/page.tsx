@@ -66,16 +66,10 @@ export default function LoginPage() {
     }
   };
 
-  return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background">
-      {/* Dynamic Background Elements */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
-        <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] rounded-full bg-primary/10 blur-[120px] animate-pulse" />
-        <div className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] rounded-full bg-primary/5 blur-[120px] animate-pulse delay-700" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] dark:opacity-[0.05]" />
-      </div>
+    return (
+      <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-transparent">
+        <motion.div
 
-      <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
