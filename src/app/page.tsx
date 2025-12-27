@@ -119,16 +119,36 @@ export default function DashboardPage() {
           <CardContent className="h-[300px]">
             {teamData.some(t => t.requests > 0) ? (
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={teamData}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff10" />
-                  <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                  <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                  <Tooltip 
-                    cursor={{ fill: '#ffffff05' }}
-                    contentStyle={{ backgroundColor: '#18181b', border: 'none', borderRadius: '8px', color: '#fff' }}
-                  />
-                  <Bar dataKey="requests" fill="currentColor" className="fill-primary" radius={[4, 4, 0, 0]} />
-                </BarChart>
+                  <BarChart data={teamData}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" className="opacity-[0.05]" />
+                    <XAxis 
+                      dataKey="name" 
+                      stroke="currentColor" 
+                      className="opacity-50"
+                      fontSize={12} 
+                      tickLine={false} 
+                      axisLine={false} 
+                    />
+                    <YAxis 
+                      stroke="currentColor" 
+                      className="opacity-50"
+                      fontSize={12} 
+                      tickLine={false} 
+                      axisLine={false} 
+                    />
+                    <Tooltip 
+                      cursor={{ fill: 'currentColor', opacity: 0.05 }}
+                      contentStyle={{ 
+                        backgroundColor: 'var(--card)', 
+                        border: '1px solid var(--border)', 
+                        borderRadius: '12px',
+                        boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'
+                      }}
+                      itemStyle={{ color: 'var(--foreground)' }}
+                    />
+                    <Bar dataKey="requests" fill="var(--primary)" radius={[6, 6, 0, 0]} />
+                  </BarChart>
+
               </ResponsiveContainer>
             ) : (
               <div className="flex h-full items-center justify-center text-muted-foreground italic border-2 border-dashed border-white/5 rounded-lg">
@@ -163,9 +183,16 @@ export default function DashboardPage() {
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip 
-                      contentStyle={{ backgroundColor: '#18181b', border: 'none', borderRadius: '8px', color: '#fff' }}
-                    />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: 'var(--card)', 
+                          border: '1px solid var(--border)', 
+                          borderRadius: '12px',
+                          boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'
+                        }}
+                        itemStyle={{ color: 'var(--foreground)' }}
+                      />
+
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="mt-4 flex justify-center gap-6">
