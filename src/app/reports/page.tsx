@@ -1,7 +1,19 @@
 'use client';
 
 import { useMemo, useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer, 
+  PieChart, 
+  Pie, 
+  Cell,
+  Legend
+} from '@/components/RechartsWrapper';
 import { 
   BarChart3, 
   PieChart as PieChartIcon, 
@@ -12,12 +24,6 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useStore } from '@/store/useStore';
-
-// Dynamic import for Recharts to avoid SSR issues
-const Charts = dynamic(() => import('@/components/RechartsWrapper'), { 
-  ssr: false,
-  loading: () => <div className="h-full w-full flex items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
-});
 
 export default function ReportsPage() {
   const { equipment, requests, teams } = useStore();
@@ -160,18 +166,18 @@ export default function ReportsPage() {
           </CardHeader>
             <CardContent className="h-[250px] flex items-center justify-center">
               {hasTeamData ? (
-                <Charts.ResponsiveContainer width="100%" height="100%">
-                  <Charts.BarChart data={teamData} layout="vertical">
-                    <Charts.CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#ffffff10" />
-                    <Charts.XAxis type="number" hide />
-                    <Charts.YAxis dataKey="name" type="category" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} width={100} />
-                    <Charts.Tooltip 
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={teamData} layout="vertical">
+                    <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#ffffff10" />
+                    <XAxis type="number" hide />
+                    <YAxis dataKey="name" type="category" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} width={100} />
+                    <Tooltip 
                       cursor={{ fill: '#ffffff05' }}
                       contentStyle={{ backgroundColor: '#18181b', border: 'none', borderRadius: '8px', color: '#fff' }}
                     />
-                    <Charts.Bar dataKey="count" fill="#3b82f6" radius={[0, 4, 4, 0]} barSize={20} />
-                  </Charts.BarChart>
-                </Charts.ResponsiveContainer>
+                    <Bar dataKey="count" fill="#3b82f6" radius={[0, 4, 4, 0]} barSize={20} />
+                  </BarChart>
+                </ResponsiveContainer>
               ) : (
               <div className="text-center space-y-2 italic border-2 border-dashed border-white/5 p-4 rounded-lg w-full">
                 <p className="text-sm text-muted-foreground">No active requests assigned to teams.</p>
@@ -193,9 +199,9 @@ export default function ReportsPage() {
           </CardHeader>
             <CardContent className="h-[300px] flex items-center justify-center">
               {hasCategoryData ? (
-                <Charts.ResponsiveContainer width="100%" height="100%">
-                  <Charts.PieChart>
-                    <Charts.Pie
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
                       data={categoryData}
                       cx="50%"
                       cy="50%"
@@ -206,15 +212,15 @@ export default function ReportsPage() {
                       label
                     >
                       {categoryData.map((entry, index) => (
-                        <Charts.Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
-                    </Charts.Pie>
-                    <Charts.Tooltip 
+                    </Pie>
+                    <Tooltip 
                       contentStyle={{ backgroundColor: '#18181b', border: 'none', borderRadius: '8px', color: '#fff' }}
                     />
-                    <Charts.Legend iconType="circle" />
-                  </Charts.PieChart>
-                </Charts.ResponsiveContainer>
+                    <Legend iconType="circle" />
+                  </PieChart>
+                </ResponsiveContainer>
               ) : (
                 <div className="text-center space-y-2 italic border-2 border-dashed border-white/5 p-4 rounded-lg w-full">
                   <p className="text-sm text-muted-foreground">Category data not available.</p>
@@ -233,9 +239,9 @@ export default function ReportsPage() {
           </CardHeader>
             <CardContent className="h-[300px] flex items-center justify-center">
               {hasStatusData ? (
-                <Charts.ResponsiveContainer width="100%" height="100%">
-                  <Charts.PieChart>
-                    <Charts.Pie
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
                       data={statusData}
                       cx="50%"
                       cy="50%"
@@ -245,15 +251,15 @@ export default function ReportsPage() {
                       dataKey="value"
                     >
                       {statusData.map((entry, index) => (
-                        <Charts.Cell key={`cell-${index}`} fill={COLORS[(index + 2) % COLORS.length]} />
+                        <Cell key={`cell-${index}`} fill={COLORS[(index + 2) % COLORS.length]} />
                       ))}
-                    </Charts.Pie>
-                    <Charts.Tooltip 
+                    </Pie>
+                    <Tooltip 
                       contentStyle={{ backgroundColor: '#18181b', border: 'none', borderRadius: '8px', color: '#fff' }}
                     />
-                    <Charts.Legend iconType="circle" />
-                  </Charts.PieChart>
-                </Charts.ResponsiveContainer>
+                    <Legend iconType="circle" />
+                  </PieChart>
+                </ResponsiveContainer>
               ) : (
                 <div className="text-center space-y-2 italic border-2 border-dashed border-white/5 p-4 rounded-lg w-full">
                   <p className="text-sm text-muted-foreground">Status data not available.</p>

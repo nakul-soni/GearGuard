@@ -1,9 +1,20 @@
 'use client';
 
 import { useMemo, useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
-import { useShallow } from 'zustand/shallow';
+import { useShallow } from 'zustand/react/shallow';
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer, 
+  PieChart, 
+  Pie, 
+  Cell 
+} from '@/components/RechartsWrapper';
 import { 
   Settings, 
   ClipboardList, 
@@ -15,12 +26,6 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useStore } from '@/store/useStore';
-
-// Dynamic import for Recharts to avoid SSR issues
-const Charts = dynamic(() => import('@/components/RechartsWrapper'), { 
-  ssr: false,
-  loading: () => <div className="h-full w-full flex items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
-});
 
 export default function DashboardPage() {
   const [mounted, setMounted] = useState(false);
@@ -113,18 +118,18 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="h-[300px]">
             {teamData.some(t => t.requests > 0) ? (
-              <Charts.ResponsiveContainer width="100%" height="100%">
-                <Charts.BarChart data={teamData}>
-                  <Charts.CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff10" />
-                  <Charts.XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                  <Charts.YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                  <Charts.Tooltip 
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={teamData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff10" />
+                  <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                  <Tooltip 
                     cursor={{ fill: '#ffffff05' }}
                     contentStyle={{ backgroundColor: '#18181b', border: 'none', borderRadius: '8px', color: '#fff' }}
                   />
-                  <Charts.Bar dataKey="requests" fill="currentColor" className="fill-primary" radius={[4, 4, 0, 0]} />
-                </Charts.BarChart>
-              </Charts.ResponsiveContainer>
+                  <Bar dataKey="requests" fill="currentColor" className="fill-primary" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
             ) : (
               <div className="flex h-full items-center justify-center text-muted-foreground italic border-2 border-dashed border-white/5 rounded-lg">
                 No active requests assigned to teams
@@ -140,44 +145,44 @@ export default function DashboardPage() {
               Request Distribution
             </CardTitle>
           </CardHeader>
-            <CardContent className="h-[300px]">
-              {requests.length > 0 ? (
-                <>
-                  <Charts.ResponsiveContainer width="100%" height="100%">
-                    <Charts.PieChart>
-                      <Charts.Pie
-                        data={chartData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={80}
-                        paddingAngle={5}
-                        dataKey="value"
-                      >
-                        {chartData.map((entry, index) => (
-                          <Charts.Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Charts.Pie>
-                      <Charts.Tooltip 
-                        contentStyle={{ backgroundColor: '#18181b', border: 'none', borderRadius: '8px', color: '#fff' }}
-                      />
-                    </Charts.PieChart>
-                  </Charts.ResponsiveContainer>
-                  <div className="mt-4 flex justify-center gap-6">
-                    {chartData.map((entry, index) => (
-                      <div key={entry.name} className="flex items-center gap-2">
-                        <div className="h-3 w-3 rounded-full" style={{ backgroundColor: COLORS[index] }} />
-                        <span className="text-xs text-muted-foreground">{entry.name}</span>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <div className="flex h-full items-center justify-center text-muted-foreground italic border-2 border-dashed border-white/5 rounded-lg">
-                  No request data available
+          <CardContent className="h-[300px]">
+            {requests.length > 0 ? (
+              <>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={chartData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                      {chartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: '#18181b', border: 'none', borderRadius: '8px', color: '#fff' }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="mt-4 flex justify-center gap-6">
+                  {chartData.map((entry, index) => (
+                    <div key={entry.name} className="flex items-center gap-2">
+                      <div className="h-3 w-3 rounded-full" style={{ backgroundColor: COLORS[index] }} />
+                      <span className="text-xs text-muted-foreground">{entry.name}</span>
+                    </div>
+                  ))}
                 </div>
-              )}
-            </CardContent>
+              </>
+            ) : (
+              <div className="flex h-full items-center justify-center text-muted-foreground italic border-2 border-dashed border-white/5 rounded-lg">
+                No request data available
+              </div>
+            )}
+          </CardContent>
         </Card>
       </div>
     </div>
