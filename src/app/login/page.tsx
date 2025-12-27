@@ -69,12 +69,17 @@ export default function LoginPage() {
     return (
       <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-transparent">
         <motion.div
-
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        className="w-full max-w-md z-10 p-4"
-      >
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          whileHover={{ 
+            rotateX: 2, 
+            rotateY: -2,
+            transition: { duration: 0.5 }
+          }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="w-full max-w-md z-10 p-4"
+          style={{ perspective: "1000px" }}
+        >
         <div className="flex flex-col items-center justify-center gap-4 mb-8">
           <motion.div 
             whileHover={{ rotate: 10, scale: 1.1 }}
