@@ -27,9 +27,11 @@ export interface MaintenanceTeam {
 export interface User {
   id: string;
   name: string;
+  email?: string;
   avatar?: string;
   teamId?: string;
   role: 'Technician' | 'Manager' | 'Employee';
+  createdAt?: string;
 }
 
 export type RequestType = 'Corrective' | 'Preventive';

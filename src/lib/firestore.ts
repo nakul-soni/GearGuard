@@ -6,6 +6,7 @@ import {
   addDoc,
   updateDoc,
   deleteDoc,
+  deleteField,
   query,
   where,
   orderBy,
@@ -108,7 +109,11 @@ export const usersService = {
   },
 
   async update(id: string, updates: Partial<User>): Promise<void> {
-    await updateDoc(doc(db, COLLECTIONS.users, id), updates);
+    const updateData: Record<string, unknown> = { ...updates };
+    if (updates.teamId === undefined) {
+      updateData.teamId = deleteField();
+    }
+    await updateDoc(doc(db, COLLECTIONS.users, id), updateData);
   },
 
   subscribe(callback: (users: User[]) => void): Unsubscribe {
