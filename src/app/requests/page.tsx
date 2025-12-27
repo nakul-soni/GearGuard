@@ -160,7 +160,7 @@ function RequestsListContent() {
                           <span className="text-sm">{tech.name}</span>
                         </div>
                       ) : (
-                        <span className="text-xs text-muted-foregrounditalic">Unassigned</span>
+                          <span className="text-xs text-muted-foreground italic">Unassigned</span>
                       )}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
@@ -171,9 +171,9 @@ function RequestsListContent() {
                         <Link href={`/requests/${req.id}`}>Details</Link>
                       </Button>
                     </TableCell>
-                  </TableRow>
-                );
-              })}
+                      </motion.tr>
+                  );
+                })}
             </AnimatePresence>
           </TableBody>
         </Table>
