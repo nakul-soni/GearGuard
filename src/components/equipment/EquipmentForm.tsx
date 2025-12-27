@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useStore } from '@/store/useStore';
-import { Equipment, EquipmentCategory } from '@/types';
+import { Equipment, EquipmentCategory, EquipmentStatus, User } from '@/types';
 import { toast } from 'sonner';
 
 const equipmentSchema = z.object({
@@ -31,7 +31,7 @@ const equipmentSchema = z.object({
   warrantyInfo: z.string(),
   location: z.string().min(2, 'Location is required'),
   department: z.string().min(2, 'Department is required'),
-  assignedEmployee: z.string().min(2, 'Assigned employee is required'),
+  assignedEmployee: z.string().min(1, 'Assigned employee is required'),
   maintenanceTeamId: z.string(),
   category: z.enum(['Manufacturing', 'Transportation', 'Computing', 'Office', 'Other']),
 });
@@ -42,7 +42,9 @@ interface EquipmentFormProps {
 }
 
 export function EquipmentForm({ onSuccess, initialData }: EquipmentFormProps) {
-  const { addEquipment, updateEquipment, teams } = useStore();
+  const { addEquipment, updateEquipment, teams, users } = useStore();
+
+  const registeredUsers = users.filter(user => user.name && user.name.trim() !== '');
 
   const form = useForm<z.infer<typeof equipmentSchema>>({
     resolver: zodResolver(equipmentSchema),
@@ -172,19 +174,30 @@ export function EquipmentForm({ onSuccess, initialData }: EquipmentFormProps) {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="assignedEmployee"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Assigned Employee</FormLabel>
-                <FormControl>
-                  <Input placeholder="John Doe" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="assignedEmployee"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Assigned Employee</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select employee" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {registeredUsers.map((user) => (
+                        <SelectItem key={user.id} value={user.name}>
+                          {user.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
