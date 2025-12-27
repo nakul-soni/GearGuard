@@ -33,25 +33,28 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-background/60 px-8 backdrop-blur-xl transition-all duration-300">
-      <div className="flex w-full max-w-sm items-center gap-2 group">
+    <header className="sticky top-0 z-30 flex h-20 w-full items-center justify-between border-b border-border/40 bg-background/40 px-8 backdrop-blur-2xl transition-all duration-300">
+      <div className="flex w-full max-w-sm items-center gap-3 group glass px-4 py-2 rounded-2xl border-none shadow-none bg-muted/30 focus-within:bg-muted/50 transition-all">
         <Search className="h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
         <Input 
           type="search" 
-          placeholder="Search equipment, requests..." 
-          className="h-9 border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/50 transition-all"
+          placeholder="Quick search..." 
+          className="h-8 border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/50 transition-all"
         />
       </div>
       
-      <div className="flex items-center gap-2">
-        <ModeToggle />
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-1.5 glass p-1 rounded-xl">
+          <ModeToggle />
+          
+          <Button variant="ghost" size="icon" className="h-9 w-9 relative hover:bg-primary/10 transition-colors rounded-lg">
+            <Bell className="h-5 w-5" />
+            <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-destructive animate-ping" />
+            <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-destructive" />
+          </Button>
+        </div>
         
-        <Button variant="ghost" size="icon" className="relative hover:bg-primary/10 transition-colors">
-          <Bell className="h-5 w-5" />
-          <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-destructive animate-pulse" />
-        </Button>
-        
-        <div className="h-6 w-px bg-border mx-2" />
+        <div className="h-8 w-px bg-border/40 mx-1" />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

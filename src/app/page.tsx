@@ -77,30 +77,45 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard Overview</h1>
-        <p className="text-muted-foreground">Welcome back, Admin. Here's what's happening with GearGuard today.</p>
-      </div>
+    <div className="space-y-10">
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h1 className="text-4xl font-black tracking-tighter text-gradient">
+          Dashboard Overview
+        </h1>
+        <p className="text-muted-foreground font-medium">Welcome back, Admin. Here's what's happening with GearGuard today.</p>
+      </motion.div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat, index) => (
           <motion.div
             key={stat.label}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ 
+              type: "spring",
+              stiffness: 260,
+              damping: 20,
+              delay: index * 0.1 
+            }}
           >
-            <Card className="overflow-hidden border-none bg-card/50 shadow-lg backdrop-blur-sm transition-all hover:bg-card/80">
+            <Card className="glass-card overflow-hidden border-none group">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
-                    <h3 className="text-2xl font-bold">{stat.value}</h3>
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{stat.label}</p>
+                    <h3 className="text-3xl font-bold tracking-tight">{stat.value}</h3>
                   </div>
-                  <div className={`rounded-xl p-3 ${stat.bg}`}>
-                    <stat.icon className={`h-6 w-6 ${stat.color}`} />
+                  <div className={`rounded-2xl p-4 transition-transform duration-500 group-hover:rotate-12 group-hover:scale-110 ${stat.bg}`}>
+                    <stat.icon className={`h-7 w-7 ${stat.color}`} />
                   </div>
+                </div>
+                <div className="mt-4 flex items-center gap-1 text-xs font-medium text-emerald-500">
+                  <TrendingUp className="h-3 w-3" />
+                  <span>+12.5% from last month</span>
                 </div>
               </CardContent>
             </Card>

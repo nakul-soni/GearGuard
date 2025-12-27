@@ -29,20 +29,20 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r bg-card/30 backdrop-blur-xl transition-all duration-300">
+    <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r bg-sidebar/40 backdrop-blur-2xl transition-all duration-300">
       <div className="flex h-full flex-col gap-2 px-4 py-6">
-        <Link href="/" className="flex items-center gap-2 px-2 pb-8 group">
+        <Link href="/" className="flex items-center gap-3 px-2 pb-10 group">
           <motion.div 
             whileHover={{ scale: 1.1, rotate: 5 }}
             whileTap={{ scale: 0.9 }}
-            className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/20 transition-all"
+            className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/20 transition-all glow-primary"
           >
-            <ShieldCheck className="h-6 w-6" />
+            <ShieldCheck className="h-7 w-7" />
           </motion.div>
-          <span className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">GearGuard</span>
+          <span className="text-2xl font-black tracking-tighter text-gradient">GearGuard</span>
         </Link>
         
-        <nav className="flex-1 space-y-2">
+        <nav className="flex-1 space-y-2.5">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             return (
@@ -53,16 +53,16 @@ export function Sidebar() {
               >
                 <div
                   className={cn(
-                    "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-300",
+                    "flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold transition-all duration-300",
                     isActive 
                       ? "text-primary-foreground" 
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                      : "text-muted-foreground hover:text-primary hover:bg-primary/5"
                   )}
                 >
                   {isActive && (
                     <motion.div
                       layoutId="active-nav"
-                      className="absolute inset-0 bg-primary rounded-xl shadow-md shadow-primary/20"
+                      className="absolute inset-0 bg-primary rounded-2xl shadow-xl shadow-primary/20 glow-primary"
                       initial={false}
                       transition={{
                         type: "spring",
@@ -72,8 +72,8 @@ export function Sidebar() {
                     />
                   )}
                   <item.icon className={cn(
-                    "h-4 w-4 relative z-10 transition-transform duration-300 group-hover:scale-110",
-                    isActive ? "text-primary-foreground" : "group-hover:text-primary"
+                    "h-5 w-5 relative z-10 transition-all duration-500",
+                    isActive ? "text-primary-foreground" : "group-hover:scale-110 group-hover:rotate-6"
                   )} />
                   <span className="relative z-10">{item.label}</span>
                 </div>
