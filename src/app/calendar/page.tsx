@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   format, 
   addMonths, 
@@ -49,13 +49,19 @@ export default function CalendarPage() {
 
   const calendarRequests = requests.filter(r => r.scheduledDate || r.createdAt);
 
-  const getDayRequests = (day: Date) => {
-    const dateStr = format(day, 'yyyy-MM-dd');
-    return calendarRequests.filter(r => 
-      r.scheduledDate === dateStr || 
-      (!r.scheduledDate && r.createdAt.startsWith(dateStr))
-    );
-  };
+    const getDayRequests = (day: Date) => {
+      const dateStr = format(day, 'yyyy-MM-dd');
+      return calendarRequests.filter(r => {
+        if (r.scheduledDate === dateStr) return true;
+        if (!r.scheduledDate && r.createdAt) {
+          const createdAtStr = typeof r.createdAt === 'string' 
+            ? r.createdAt 
+            : (r.createdAt as any).toDate?.().toISOString() || String(r.createdAt);
+          return createdAtStr.startsWith(dateStr);
+        }
+        return false;
+      });
+    };
 
   const statusColors: Record<string, string> = {
     'New': 'bg-blue-500',
