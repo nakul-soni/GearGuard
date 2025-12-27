@@ -4,7 +4,6 @@ import { Search, Bell, Menu, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ModeToggle } from './mode-toggle';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useAuth } from '@/components/providers/firebase-auth-provider';
+import { useAuth } from '@/components/providers/auth-provider';
 import { signOut } from '@/lib/auth';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
@@ -44,7 +43,6 @@ export function Header() {
       </div>
       
       <div className="flex items-center gap-4">
-        <ModeToggle />
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="h-5 w-5" />
           <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-destructive" />

@@ -48,18 +48,3 @@ export const storageService = {
     return ref(storage, path);
   },
 };
-
-export async function uploadFile(path: string, file: File): Promise<string> {
-  return storageService.uploadFile(file, path);
-}
-
-export async function deleteFile(path: string): Promise<void> {
-  return storageService.deleteFile(path);
-}
-
-export async function uploadImage(file: File, folder: string = 'images'): Promise<string> {
-  const timestamp = Date.now();
-  const extension = file.name.split('.').pop();
-  const path = `${folder}/${timestamp}-${Math.random().toString(36).substring(7)}.${extension}`;
-  return uploadFile(path, file);
-}
