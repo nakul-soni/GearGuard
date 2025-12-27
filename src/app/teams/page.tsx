@@ -49,7 +49,7 @@ export default function TeamsPage() {
   const [selectedEquipmentIds, setSelectedEquipmentIds] = useState<string[]>([]);
 
   const availableUsers = useMemo(() => {
-    return users.filter(u => !u.teamId);
+    return users.filter(u => !u.teamId && u.name && u.name.trim() !== '');
   }, [users]);
 
   const handleCreateTeam = async () => {
