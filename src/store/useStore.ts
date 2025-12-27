@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import { 
   Equipment, 
   MaintenanceTeam, 
@@ -8,123 +7,152 @@ import {
   RequestStatus,
   EquipmentStatus
 } from '../types';
+import {
+  equipmentService,
+  teamsService,
+  usersService,
+  requestsService,
+  seedInitialData,
+} from '../lib/firestore';
 
 interface GearGuardState {
   equipment: Equipment[];
   teams: MaintenanceTeam[];
   users: User[];
   requests: MaintenanceRequest[];
-  addEquipment: (equipment: Equipment) => void;
-  updateEquipment: (id: string, updates: Partial<Equipment>) => void;
-  deleteEquipment: (id: string) => void;
-  addTeam: (team: MaintenanceTeam) => void;
-  updateTeam: (id: string, updates: Partial<MaintenanceTeam>) => void;
-  deleteTeam: (id: string) => void;
-  addRequest: (request: MaintenanceRequest) => void;
-  updateRequest: (id: string, updates: Partial<MaintenanceRequest>) => void;
-  deleteRequest: (id: string) => void;
-  moveRequest: (requestId: string, newStatus: RequestStatus) => void;
+  loading: boolean;
+  initialized: boolean;
+  
+  initializeData: () => Promise<void>;
+  subscribeToData: () => () => void;
+  
+  addEquipment: (equipment: Omit<Equipment, 'id'>) => Promise<void>;
+  updateEquipment: (id: string, updates: Partial<Equipment>) => Promise<void>;
+  deleteEquipment: (id: string) => Promise<void>;
+  
+  addTeam: (team: Omit<MaintenanceTeam, 'id'>) => Promise<void>;
+  updateTeam: (id: string, updates: Partial<MaintenanceTeam>) => Promise<void>;
+  deleteTeam: (id: string) => Promise<void>;
+  
+  addRequest: (request: Omit<MaintenanceRequest, 'id'>) => Promise<void>;
+  updateRequest: (id: string, updates: Partial<MaintenanceRequest>) => Promise<void>;
+  deleteRequest: (id: string) => Promise<void>;
+  moveRequest: (requestId: string, newStatus: RequestStatus) => Promise<void>;
+  
+  setEquipment: (equipment: Equipment[]) => void;
+  setTeams: (teams: MaintenanceTeam[]) => void;
+  setUsers: (users: User[]) => void;
+  setRequests: (requests: MaintenanceRequest[]) => void;
 }
 
-const mockTeams: MaintenanceTeam[] = [
-  { id: 'team-1', name: 'Mechanics', description: 'Mechanical repairs', memberIds: ['u-1', 'u-2'] },
-  { id: 'team-2', name: 'Electricians', description: 'Electrical systems', memberIds: ['u-3'] },
-  { id: 'team-3', name: 'IT Support', description: 'IT systems', memberIds: ['u-4'] },
-];
+export const useStore = create<GearGuardState>()((set, get) => ({
+  equipment: [],
+  teams: [],
+  users: [],
+  requests: [],
+  loading: true,
+  initialized: false,
 
-const mockUsers: User[] = [
-  { id: 'u-1', name: 'John Doe', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John', teamId: 'team-1', role: 'Technician' },
-  { id: 'u-2', name: 'Mike Smith', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mike', teamId: 'team-1', role: 'Technician' },
-  { id: 'u-3', name: 'Sarah Wilson', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah', teamId: 'team-2', role: 'Technician' },
-  { id: 'u-4', name: 'Alex Brown', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex', teamId: 'team-3', role: 'Technician' },
-];
-
-const mockEquipment: Equipment[] = [
-  {
-    id: 'eq-1',
-    name: 'CNC Machine',
-    serialNumber: 'CNC-001',
-    purchaseDate: '2023-01-15',
-    warrantyInfo: '2 Years',
-    location: 'Floor A',
-    department: 'Production',
-    assignedEmployee: 'Robert J.',
-    maintenanceTeamId: 'team-1',
-    defaultTechnicianId: 'u-1',
-    category: 'Manufacturing',
-    status: 'Active'
+  initializeData: async () => {
+    if (get().initialized) return;
+    
+    set({ loading: true });
+    try {
+      await seedInitialData();
+      
+      const [equipment, teams, users, requests] = await Promise.all([
+        equipmentService.getAll(),
+        teamsService.getAll(),
+        usersService.getAll(),
+        requestsService.getAll(),
+      ]);
+      
+      set({
+        equipment,
+        teams,
+        users,
+        requests,
+        loading: false,
+        initialized: true,
+      });
+    } catch (error) {
+      console.error('Failed to initialize data:', error);
+      set({ loading: false });
+    }
   },
-  {
-    id: 'eq-2',
-    name: 'Workstation IT01',
-    serialNumber: 'WS-7722',
-    purchaseDate: '2023-11-01',
-    warrantyInfo: '3 Years',
-    location: 'Office 402',
-    department: 'Engineering',
-    assignedEmployee: 'Alice C.',
-    maintenanceTeamId: 'team-3',
-    defaultTechnicianId: 'u-4',
-    category: 'Computing',
-    status: 'Active'
-  }
-];
 
-const mockRequests: MaintenanceRequest[] = [
-  {
-    id: 'req-1',
-    subject: 'Leaking fluid',
-    equipmentId: 'eq-1',
-    type: 'Corrective',
-    status: 'In Progress',
-    assignedTechnicianId: 'u-1',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }
-];
+  subscribeToData: () => {
+    const unsubEquipment = equipmentService.subscribe((equipment) => {
+      set({ equipment });
+    });
+    
+    const unsubTeams = teamsService.subscribe((teams) => {
+      set({ teams });
+    });
+    
+    const unsubUsers = usersService.subscribe((users) => {
+      set({ users });
+    });
+    
+    const unsubRequests = requestsService.subscribe((requests) => {
+      set({ requests });
+    });
 
-export const useStore = create<GearGuardState>()(
-  persist(
-    (set) => ({
-      equipment: mockEquipment,
-      teams: mockTeams,
-      users: mockUsers,
-      requests: mockRequests,
-      addEquipment: (eq) => set((state) => ({ equipment: [...state.equipment, eq] })),
-      updateEquipment: (id, updates) => set((state) => ({
-        equipment: state.equipment.map((eq) => eq.id === id ? { ...eq, ...updates } : eq)
-      })),
-      deleteEquipment: (id) => set((state) => ({
-        equipment: state.equipment.filter((eq) => eq.id !== id)
-      })),
-      addTeam: (team) => set((state) => ({ teams: [...state.teams, team] })),
-      updateTeam: (id, updates) => set((state) => ({
-        teams: state.teams.map((t) => t.id === id ? { ...t, ...updates } : t)
-      })),
-      deleteTeam: (id) => set((state) => ({
-        teams: state.teams.filter((t) => t.id !== id)
-      })),
-      addRequest: (req) => set((state) => ({ requests: [...state.requests, req] })),
-      updateRequest: (id, updates) => set((state) => ({
-        requests: state.requests.map((r) => r.id === id ? { ...r, ...updates } : r)
-      })),
-      deleteRequest: (id) => set((state) => ({
-        requests: state.requests.filter((r) => r.id !== id)
-      })),
-      moveRequest: (requestId, newStatus) => set((state) => {
-        const updatedRequests = state.requests.map((r) => 
-          r.id === requestId ? { ...r, status: newStatus, updatedAt: new Date().toISOString() } : r
-        );
-        const request = state.requests.find(r => r.id === requestId);
-        if (newStatus === 'Scrap' && request) {
-          const updatedEquipment = state.equipment.map(eq => 
-            eq.id === request.equipmentId ? { ...eq, status: 'Scrapped' as EquipmentStatus } : eq
-          );
-          return { requests: updatedRequests, equipment: updatedEquipment };
-        }
-        return { requests: updatedRequests };
-      }),
-    }),
-    { name: 'gear-guard-storage' }
-  )
-);
+    return () => {
+      unsubEquipment();
+      unsubTeams();
+      unsubUsers();
+      unsubRequests();
+    };
+  },
+
+  addEquipment: async (eq) => {
+    await equipmentService.create(eq);
+  },
+
+  updateEquipment: async (id, updates) => {
+    await equipmentService.update(id, updates);
+  },
+
+  deleteEquipment: async (id) => {
+    await equipmentService.delete(id);
+  },
+
+  addTeam: async (team) => {
+    await teamsService.create(team);
+  },
+
+  updateTeam: async (id, updates) => {
+    await teamsService.update(id, updates);
+  },
+
+  deleteTeam: async (id) => {
+    await teamsService.delete(id);
+  },
+
+  addRequest: async (req) => {
+    await requestsService.create(req);
+  },
+
+  updateRequest: async (id, updates) => {
+    await requestsService.update(id, updates);
+  },
+
+  deleteRequest: async (id) => {
+    await requestsService.delete(id);
+  },
+
+  moveRequest: async (requestId, newStatus) => {
+    const request = get().requests.find(r => r.id === requestId);
+    await requestsService.moveToStatus(requestId, newStatus);
+    
+    if (newStatus === 'Scrap' && request) {
+      await equipmentService.update(request.equipmentId, { status: 'Scrapped' as EquipmentStatus });
+    }
+  },
+
+  setEquipment: (equipment) => set({ equipment }),
+  setTeams: (teams) => set({ teams }),
+  setUsers: (users) => set({ users }),
+  setRequests: (requests) => set({ requests }),
+}));
