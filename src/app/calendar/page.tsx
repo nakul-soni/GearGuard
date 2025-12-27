@@ -27,21 +27,23 @@ export default function CalendarPage() {
   const { requests, equipment } = useStore();
   const [currentDate, setCurrentDate] = useState(new Date());
 
-  const preventiveRequests = requests.filter(r => r.type === 'Preventive' && r.scheduledDate);
-
-  const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
-  const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
-
-  const monthStart = startOfMonth(currentDate);
-  const monthEnd = endOfMonth(monthStart);
-  const startDate = startOfWeek(monthStart);
-  const endDate = endOfWeek(monthEnd);
-
-  const calendarDays = eachDayOfInterval({ start: startDate, end: endDate });
+  const calendarRequests = requests.filter(r => r.scheduledDate || r.createdAt);
 
   const getDayRequests = (day: Date) => {
-    return preventiveRequests.filter(r => isSameDay(new Date(r.scheduledDate!), day));
+    const dateStr = format(day, 'yyyy-MM-dd');
+    return calendarRequests.filter(r => 
+      r.scheduledDate === dateStr || 
+      (!r.scheduledDate && r.createdAt.startsWith(dateStr))
+    );
   };
+
+  const statusColors: Record<string, string> = {
+    'New': 'bg-blue-500',
+    'In Progress': 'bg-amber-500',
+    'Repaired': 'bg-emerald-500',
+    'Scrap': 'bg-rose-500'
+  };
+
 
   return (
     <div className="space-y-6">
@@ -106,25 +108,23 @@ export default function CalendarPage() {
                     </Button>
                   </div>
                   
-                  <div className="space-y-1">
-                    {dayRequests.map(req => {
-                      const eq = equipment.find(e => e.id === req.equipmentId);
-                      return (
-                        <Link 
-                          key={req.id} 
-                          href={`/requests/${req.id}`}
-                          className="block p-1 rounded bg-blue-500/10 border-l-2 border-blue-500 hover:bg-blue-500/20 transition-colors"
-                        >
-                          <p className="text-[10px] font-bold truncate text-blue-500 leading-tight">
-                            {req.subject}
-                          </p>
-                          <p className="text-[9px] truncate text-muted-foreground leading-tight">
-                            {eq?.name}
-                          </p>
-                        </Link>
-                      );
-                    })}
-                  </div>
+                    <div className="flex flex-wrap gap-1">
+                      {dayRequests.map(req => {
+                        const eq = equipment.find(e => e.id === req.equipmentId);
+                        return (
+                          <Link 
+                            key={req.id} 
+                            href={`/requests/${req.id}`}
+                            className={cn(
+                              "h-2 w-2 rounded-full ring-2 ring-background hover:scale-150 transition-transform cursor-pointer",
+                              statusColors[req.status] || 'bg-slate-400'
+                            )}
+                            title={`${req.subject} (${eq?.name || 'N/A'})`}
+                          />
+                        );
+                      })}
+                    </div>
+
                 </div>
               );
             })}

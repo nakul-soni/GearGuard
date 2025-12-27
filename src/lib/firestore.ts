@@ -230,4 +230,71 @@ export async function seedInitialData() {
       await addDoc(collection(db, COLLECTIONS.equipment), eq);
     }
   }
+
+  const requestsSnapshot = await getDocs(collection(db, COLLECTIONS.requests));
+  if (requestsSnapshot.empty) {
+    console.log('Seeding requests...');
+    const equipment = await equipmentService.getAll();
+    if (equipment.length > 0) {
+      const cnc = equipment.find(e => e.name === 'CNC Machine') || equipment[0];
+      const ws = equipment.find(e => e.name === 'Workstation IT01') || (equipment[1] || equipment[0]);
+      
+      const today = new Date().toISOString().split('T')[0];
+      const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+      const nextWeek = new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0];
+
+      const mockRequests = [
+        {
+          subject: 'Annual Calibration',
+          equipmentId: cnc.id,
+          type: 'Preventive',
+          scheduledDate: today,
+          status: 'New',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          subject: 'Oil Filter Replacement',
+          equipmentId: cnc.id,
+          type: 'Preventive',
+          scheduledDate: tomorrow,
+          status: 'In Progress',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          subject: 'Software Update',
+          equipmentId: ws.id,
+          type: 'Preventive',
+          scheduledDate: nextWeek,
+          status: 'New',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          subject: 'Broken cooling fan',
+          equipmentId: cnc.id,
+          type: 'Corrective',
+          status: 'Repaired',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          subject: 'Hydraulic leak',
+          equipmentId: cnc.id,
+          type: 'Corrective',
+          status: 'In Progress',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        }
+      ];
+
+      for (const req of mockRequests) {
+        await addDoc(collection(db, COLLECTIONS.requests), req);
+      }
+      console.log('Requests seeded.');
+    } else {
+      console.log('No equipment found to link requests to.');
+    }
+  }
 }

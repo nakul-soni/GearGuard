@@ -2,14 +2,14 @@
 
 import { useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import { useShallow } from 'zustand/shallow';
 import { 
   BarChart3, 
   PieChart as PieChartIcon, 
   TrendingUp, 
   ClipboardCheck,
   Zap,
-  Hammer
+  Hammer,
+  Inbox
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useStore } from '@/store/useStore';
@@ -29,13 +29,7 @@ const LineChart = dynamic(() => import('recharts').then(mod => mod.LineChart), {
 const Line = dynamic(() => import('recharts').then(mod => mod.Line), { ssr: false });
 
 export default function ReportsPage() {
-  const { equipment, requests, teams } = useStore(
-    useShallow((state) => ({
-      equipment: state.equipment,
-      requests: state.requests,
-      teams: state.teams,
-    }))
-  );
+  const { equipment, requests, teams } = useStore();
 
   const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
@@ -74,6 +68,20 @@ export default function ReportsPage() {
     preventiveRatio: Math.round((requests.filter(r => r.type === 'Preventive').length / requests.length) * 100) || 0,
     scrapRate: Math.round((requests.filter(r => r.status === 'Scrap').length / requests.length) * 100) || 0,
   }), [requests]);
+
+  if (requests.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+        <div className="p-6 rounded-full bg-primary/10">
+          <Inbox className="h-12 w-12 text-primary opacity-50" />
+        </div>
+        <div className="text-center">
+          <h2 className="text-2xl font-bold">No Data Available</h2>
+          <p className="text-muted-foreground">Start by creating maintenance requests to see your analytics.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
