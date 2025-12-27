@@ -49,7 +49,10 @@ export function EquipmentForm({ onSuccess, initialData }: EquipmentFormProps) {
 
     const form = useForm<z.infer<typeof equipmentSchema>>({
       resolver: zodResolver(equipmentSchema),
-      defaultValues: initialData || {
+      defaultValues: initialData ? {
+        ...initialData,
+        assignedEmployee: initialData.defaultTechnicianId || initialData.assignedEmployee
+      } : {
         name: '',
         serialNumber: '',
         purchaseDate: new Date().toISOString().split('T')[0],
@@ -71,21 +74,27 @@ export function EquipmentForm({ onSuccess, initialData }: EquipmentFormProps) {
     );
 
     useEffect(() => {
-      const currentEmployee = form.getValues('assignedEmployee');
-      if (currentEmployee && !filteredUsers.some(u => u.name === currentEmployee)) {
+      const currentEmployeeId = form.getValues('assignedEmployee');
+      if (currentEmployeeId && !filteredUsers.some(u => u.id === currentEmployeeId)) {
         form.setValue('assignedEmployee', '');
       }
     }, [selectedTeamId, filteredUsers, form]);
 
     function onSubmit(values: z.infer<typeof equipmentSchema>) {
+      const selectedUser = users.find(u => u.id === values.assignedEmployee);
+      const equipmentData = {
+        ...values,
+        assignedEmployee: selectedUser?.name || values.assignedEmployee,
+        defaultTechnicianId: selectedUser?.id || '',
+      };
+
       if (initialData) {
-        updateEquipment(initialData.id, values);
+        updateEquipment(initialData.id, equipmentData);
         toast.success('Equipment updated successfully');
       } else {
         const newEquipment = {
-          ...values,
+          ...equipmentData,
           status: 'Active' as EquipmentStatus,
-          defaultTechnicianId: '',
         };
         addEquipment(newEquipment);
         toast.success('Equipment added successfully');
@@ -202,13 +211,13 @@ export function EquipmentForm({ onSuccess, initialData }: EquipmentFormProps) {
                         <SelectValue placeholder="Select employee" />
                       </SelectTrigger>
                     </FormControl>
-                      <SelectContent>
-                        {filteredUsers.map((user) => (
-                          <SelectItem key={user.id} value={user.name}>
-                            {user.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
+                        <SelectContent>
+                          {filteredUsers.map((user) => (
+                            <SelectItem key={user.id} value={user.id}>
+                              {user.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
                   </Select>
                   <FormMessage />
                 </FormItem>

@@ -309,10 +309,13 @@ export default function TeamsPage() {
           <div className="py-4">
             <Label className="text-sm font-medium">Team Members</Label>
             <ScrollArea className="h-[300px] mt-2 rounded-md border p-2">
-              {selectedTeam && users.filter(u => u.teamId === selectedTeam.id).length > 0 ? (
-                users.filter(u => u.teamId === selectedTeam.id).map((member) => {
-                  const memberEquipment = equipment.filter(e => e.defaultTechnicianId === member.id);
-                  return (
+                {selectedTeam && users.filter(u => u.teamId === selectedTeam.id).length > 0 ? (
+                  users.filter(u => u.teamId === selectedTeam.id).map((member) => {
+                    const memberEquipment = equipment.filter(e => 
+                      e.defaultTechnicianId === member.id || 
+                      (e.assignedEmployee === member.name && e.maintenanceTeamId === selectedTeam.id)
+                    );
+                    return (
                     <div key={member.id} className="flex items-center justify-between p-2 hover:bg-muted/50 rounded-lg">
                       <div className="flex items-center gap-3">
                           <Avatar className="h-10 w-10">
