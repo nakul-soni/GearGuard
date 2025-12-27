@@ -3,12 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ClientLayout } from "@/components/layout/client-layout";
-<<<<<<< HEAD
-=======
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { FirebaseAuthProvider } from "@/components/providers/firebase-auth-provider";
 import Script from "next/script";
->>>>>>> c66372c (Final Commit)
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,15 +28,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-<<<<<<< HEAD
-    <html lang="en" className="dark">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background`}
-      >
-        <ClientLayout>
-          {children}
-        </ClientLayout>
-=======
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background`}
@@ -62,8 +50,6 @@ export default function RootLayout({
             </ClientLayout>
           </FirebaseAuthProvider>
         </ThemeProvider>
-
->>>>>>> c66372c (Final Commit)
         <Toaster position="top-right" closeButton richColors />
       </body>
     </html>
