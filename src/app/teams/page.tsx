@@ -234,13 +234,13 @@ export default function TeamsPage() {
                         teamMembers.map((member) => (
                           <Avatar key={member.id} className="inline-block border-2 border-background ring-2 ring-primary/5 transition-transform hover:z-10 hover:scale-110 cursor-pointer">
                             <AvatarImage src={member.avatar} alt={member.name} />
-                            <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
-                          </Avatar>
-                        ))
-                      ) : (
-                        <p className="text-sm text-muted-foreground">No members yet</p>
-                      )}
-                    </div>
+                              <AvatarFallback>{member.name?.charAt(0) || 'U'}</AvatarFallback>
+                            </Avatar>
+                          ))
+                        ) : (
+                          <p className="text-sm text-muted-foreground">No members yet</p>
+                        )}
+                      </div>
 
                     <div className="pt-4 border-t flex gap-2">
                       <Button 
@@ -317,7 +317,7 @@ export default function TeamsPage() {
                       <div className="flex items-center gap-3">
                         <Avatar className="h-10 w-10">
                           <AvatarImage src={member.avatar} alt={member.name} />
-                          <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+                          <AvatarFallback>{member.name?.charAt(0) || 'U'}</AvatarFallback>
                         </Avatar>
                         <div>
                           <p className="font-medium text-sm">{member.name}</p>

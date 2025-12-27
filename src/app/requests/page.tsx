@@ -29,7 +29,7 @@ function RequestsListContent() {
   const searchParams = useSearchParams();
   const equipmentIdFilter = searchParams.get('equipmentId');
   
-  const { requests, equipment, teams, users } = useStore();
+  const { requests, equipment, users } = useStore();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
@@ -122,14 +122,14 @@ function RequestsListContent() {
               {filteredRequests.map((req) => {
                 const eq = equipment.find(e => e.id === req.equipmentId);
                 const tech = users.find(u => u.id === req.assignedTechnicianId);
-                  return (
-                    <motion.tr 
-                      key={req.id}
-                      initial={{ opacity: 0 }} 
-                      animate={{ opacity: 1 }} 
-                      exit={{ opacity: 0 }}
-                      className="hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors group"
-                    >
+                return (
+                  <motion.tr 
+                    key={req.id}
+                    initial={{ opacity: 0 }} 
+                    animate={{ opacity: 1 }} 
+                    exit={{ opacity: 0 }}
+                    className="hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors group"
+                  >
                     <TableCell className="font-medium">
                       <div className="flex flex-col">
                         <span>{req.subject}</span>
@@ -160,7 +160,7 @@ function RequestsListContent() {
                           <span className="text-sm">{tech.name}</span>
                         </div>
                       ) : (
-                          <span className="text-xs text-muted-foreground italic">Unassigned</span>
+                        <span className="text-xs text-muted-foreground italic">Unassigned</span>
                       )}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
@@ -171,9 +171,9 @@ function RequestsListContent() {
                         <Link href={`/requests/${req.id}`}>Details</Link>
                       </Button>
                     </TableCell>
-                      </motion.tr>
-                  );
-                })}
+                  </motion.tr>
+                );
+              })}
             </AnimatePresence>
           </TableBody>
         </Table>
