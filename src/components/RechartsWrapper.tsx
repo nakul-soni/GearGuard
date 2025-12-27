@@ -14,7 +14,7 @@ import {
   Legend 
 } from 'recharts';
 
-export {
+const Charts = {
   BarChart,
   Bar,
   XAxis,
@@ -27,3 +27,5 @@ export {
   Cell,
   Legend
 };
+
+export default Charts;
