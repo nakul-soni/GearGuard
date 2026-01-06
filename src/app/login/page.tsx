@@ -66,21 +66,28 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 bg-grid-slate-200/20 [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]" />
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+      
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
+        className="w-full max-w-md relative z-10"
       >
-        <div className="flex items-center justify-center gap-3 mb-8">
-          <div className="rounded-xl bg-primary/10 p-3">
-            <Shield className="h-8 w-8 text-primary" />
+        <div className="flex flex-col items-center justify-center gap-4 mb-8 text-center">
+          <div className="rounded-2xl bg-primary/10 p-4 ring-1 ring-primary/20 shadow-xl shadow-primary/5">
+            <Shield className="h-10 w-10 text-primary" />
           </div>
-          <h1 className="text-3xl font-bold">GearGuard</h1>
+          <div>
+            <h1 className="text-4xl font-extrabold tracking-tight">GearGuard</h1>
+            <p className="text-muted-foreground mt-1">Smart Maintenance Management</p>
+          </div>
         </div>
 
-        <Card className="border-none shadow-2xl bg-card/80 backdrop-blur-sm">
+        <Card className="border shadow-xl bg-card/50 backdrop-blur-xl">
           <CardHeader className="text-center">
             <CardTitle>Welcome</CardTitle>
             <CardDescription>Sign in to manage your equipment maintenance</CardDescription>
